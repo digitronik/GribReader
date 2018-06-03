@@ -1,3 +1,6 @@
+import csv
+from datetime import datetime, timedelta
+
 import pygrib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -79,3 +82,65 @@ class Grb:
         plt.colorbar(cs, orientation=bar_orientation)
         plt.title(self.parameter['name'])
         plt.show()
+
+    @property
+    def longitudes(self):
+        return list(self.parameter.distinctLongitudes)
+
+    @property
+    def min_lon(self):
+        return min(self.longitudes)
+
+    @property
+    def max_lon(self):
+        return max(self.longitudes)
+
+    @property
+    def latitudes(self):
+        return list(self.parameter.distinctLatitudes)
+
+    @property
+    def min_lat(self):
+        return min(self.latitudes)
+
+    @property
+    def max_lat(self):
+        return max(self.latitudes)
+
+    @property
+    def data(self):
+        return self.parameter.values.data
+
+    def data_latlon(self, lat, lon):
+        return self.data[self.latitudes.index(lat)][self.longitudes.index(lon)]
+
+    @property
+    def datadate(self):
+        return datetime.strptime(str(self.parameter.dataDate), '%Y%m%d')
+
+    @property
+    def forcast_time(self):
+        return self.parameter.forecastTime
+
+    @property
+    def forcast_datetime(self):
+        return self.datadate + timedelta(hours=self.forcast_time)
+
+    def export_csv(self, file):
+        with open("export.csv", "wb") as csvfile:
+            import ipdb; ipdb.set_trace()
+            dw = csv.writer(csvfile, delimiter=',')
+            lon_csv = ["Latitude /Longitude"] + self.latitudes
+            dw.writerow(lon_csv)
+
+            for lat in self.latitudes:
+                row = [lat]
+                for lon in self.longitudes:
+                    value = self.data_latlon(lat, lon)
+
+                    if isinstance(value, np.float64):
+                        row.append(str(value))
+                    else:
+                        row.append("--")
+                dw.writerow(row)
+        return True

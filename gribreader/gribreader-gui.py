@@ -81,10 +81,11 @@ def export_data():
         file_name = asksaveasfilename(
             filetypes=[("CSV", ".csv"), ("all files", ".*")], defaultextension=".csv"
         )
-        import ipdb
-
-        ipdb.set_trace()
-        grad.export_csv(path=file_name)
+        try:
+            grad.export_csv(path=file_name)
+            f3_notification.config(text="Successfully exported", fg="green")
+        except Exception as e:
+            f3_notification.config(text="Fail to export", fg="red")
 
 
 # Frame Management
@@ -214,6 +215,7 @@ f3_parameters.pack(fill=X, expand=0)
 
 Button(f3, text="Export", padx=58, pady=10, fg="red", command=export_data).pack(pady=10, fill=X)
 
+f3_notification = Label(f3, text=" ")
 
 # UP gui
 poll_listbox()

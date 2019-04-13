@@ -242,7 +242,7 @@ class Grb(object):
         :param path: Path to save csv file.
         :type path: str
         """
-        with open("path", "wb") as csvfile:
+        with open(path, "wb") as csvfile:
             dw = csv.writer(csvfile, delimiter=",")
             lon_csv = ["Latitude /Longitude"] + self.longitudes
             dw.writerow(lon_csv)
@@ -257,3 +257,4 @@ class Grb(object):
                     else:
                         row.append("--")
                 dw.writerow(row)
+            return True

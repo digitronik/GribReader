@@ -40,12 +40,13 @@ def select_file():
     PARAMETERS = GRIB.parameters
     f1_parameters.insert(END, *PARAMETERS)
     f2_parameters.insert(END, *PARAMETERS)
+    f3_parameters.insert(END, *PARAMETERS)
 
 
 def poll_listbox():
     global CURRENT_PAR
     global SELECTED_PAR
-    for box in [f1_parameters, f2_parameters]:
+    for box in [f1_parameters, f2_parameters, f3_parameters]:
         now = box.curselection()
         if now != CURRENT_PAR:
             CURRENT_PAR = now
@@ -56,10 +57,34 @@ def poll_listbox():
 
 def plot_data():
     global PLOT
-    if GRIB:
+    if SELECTED_PAR:
         grad = GRIB.select(SELECTED_PAR)
         plt = grad.plot_obj()
         plt.show()
+
+
+def data_value():
+    global SELECTED_PAR
+    lat = float(f2_lat.get())
+    lon = float(f2_lon.get())
+
+    if SELECTED_PAR:
+        grad = GRIB.select(SELECTED_PAR)
+        value = grad.data_latlon(lat=lat, lon=lon)
+        point_value.config(text=value)
+
+
+def export_data():
+    global SELECTED_PAR
+    if SELECTED_PAR:
+        grad = GRIB.select(SELECTED_PAR)
+        file_name = asksaveasfilename(
+            filetypes=[("CSV", ".csv"), ("all files", ".*")], defaultextension=".csv"
+        )
+        import ipdb
+
+        ipdb.set_trace()
+        grad.export_csv(path=file_name)
 
 
 # Frame Management
@@ -90,12 +115,12 @@ menu.add_command(label="Help", command="")
 
 
 # Common data for frames
-img_h = ImageTk.PhotoImage(Image.open("images/image3775.png"))
+logo = ImageTk.PhotoImage(Image.open("images/logo.png"))
 # img_h = PhotoImage(file="Images/logo_grib.png")
 
 for frame, name in zip((f0, f1, f2, f3, f4, f5), ("f0", "f1", "f2", "f3", "f4", "f5")):
-    panel_h = Label(frame, image=img_h)
-    panel_h.pack(fill=X)
+    logo_frame = Label(frame, image=logo)
+    logo_frame.pack(fill=X)
 
     if frame in [f1, f2, f3]:
         source_file = Button(
@@ -158,6 +183,36 @@ f2_title.pack(pady=2)
 
 f2_parameters = Listbox(f2, selectmode=EXTENDED)
 f2_parameters.pack(fill=X, expand=0)
+
+
+Label(f2, text="Latitude :").pack(pady=0)
+f2_lat = Entry(f2)
+f2_lat.pack(pady=2)
+
+Label(f2, text="Longitude :").pack(pady=0)
+f2_lon = Entry(f2)
+f2_lon.pack(pady=2)
+
+point_value = Label(f2, text=" ")
+point_value.pack(pady=2)
+
+value_b = Button(f2, text="VALUE", padx=58, pady=10, fg="red", command=data_value)
+value_b.pack(pady=2, fill=X)
+
+lat_indi_f2 = Label(f2, text=" ")
+lat_indi_f2.pack()
+
+lon_indi_f2 = Label(f2, text=" ")
+lon_indi_f2.pack()
+
+
+# FRAME-3 (Export Data)
+Label(f3, text="Export Data").pack(pady=2)
+
+f3_parameters = Listbox(f3, selectmode=EXTENDED)
+f3_parameters.pack(fill=X, expand=0)
+
+Button(f3, text="Export", padx=58, pady=10, fg="red", command=export_data).pack(pady=10, fill=X)
 
 
 # UP gui

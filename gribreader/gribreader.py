@@ -204,7 +204,10 @@ class Grb(object):
         :returns: Data of latitude and longitudes.
         :rtype: float
         """
-        return self.data[self.latitudes.index(lat)][self.longitudes.index(lon)]
+        try:
+            return self.data[self.latitudes.index(lat)][self.longitudes.index(lon)]
+        except ValueError:
+            raise ValueError("Latitude or Longitude not in range.")
 
     @property
     def datadate(self):
